@@ -1,45 +1,49 @@
-# -b와 --execpt-files
+# -b and --execpt-files
 
-### 디렉토리 삭제 시 삭제에서 제외할 파일을 설정하는 옵션
+### Options to set files to exclude from deletion when deleting directories
 
 <br>
 
-## 1. 개발 배경
+## 1. Background
 
-- 문제점1: find 명령어와 rm 명령어의 조합
+- Problem 1: Combination of 'find' and 'rm' commands  
 
-어떤 디렉터리에서 일부 파일은 남기고 나머지만 삭제하고자 할 때가 있다. 유닉스/ 리눅스 체제에 익숙한 사용자라면 파일/디렉터리 삭제 명령어 rm과 찾기 명령어 find를 조합하여 사용할 수 있다. 그러나 여러 파일을 삭제에서 제외할 땐 두 명령어의 조합을 사용하기 불편하다. 예시를 들자면 다음과 같다.
+ Sometimes you want to delete some files from a directory and only the rest. Users familiar with Unix/Linux systems can use a combination of the file/directory delete command rm and the find command. However, it is inconvenient to use a combination of two commands when removing multiple files. Examples include:  
     
-/find 디렉터리에 1) a.txt 2) b.c 3) c.h 4) d.py 파일이 있다고 하자. 이때 a.txt와 b.c 파일은 제외한 채 /find 디렉터리 내 모든 파일을 삭제하려고 하면 “find . type f -and ! -name a.c and ! -name b.c | xargs rm -rvf”를 입력해야 한다.
+ Suppose you have 1) a.txt 2) b.c 3) c.h 4) d.py files in the /find directory.
+If you want to delete all files in the /find directory except for the a.txt and b.c files, you muse input "find . type f -and ! -name a.c and ! -name b.c | xargs rm -rvf".  
 
 ![find . -type f -and ! -name a.c -and ! -name b.c | xargs rm -rvf ](/imgs/1find_rm.png "find . -type f -and ! -name a.c -and ! -name b.c | xargs rm -rvf ")
 
--name [파일] -and를 반복해서 적어야 할 뿐만 아니라, 상당히 많은 파일을 삭제에서 제외해야 할 때는 입력 및 명령어 수정이 불편해진다. 또한 여러 개의 삭제 제외 파일을 입력한 후 제대로 입력했는지에 관한 확인 절차가 없으므로 사용자가 스스로 확인해야 하는 번거로움이 존재한다. 추가로 며칠 동안 사용하지 않으면 금세 잊어버릴 만큼 명령어가 깔끔해 보이지 않으며, 자칫 a.c 파일과 b.c 파일을 찾아서 삭제하라는 명령어처럼 보일 만큼 명령어가 직관적이지도 않다.
+ You have to input "-name [file] -and' repeatedly, and if you want to exclue many files, it is inconvenient to input and modify commands. In addition, there is a hassle that user has to check themselves because there is no procedure to check whether they have inputted correctly after inputting multiple deletion exclusion files.  
+ If you don't use it for an additional few days, the command doesn't look neat enough to forget quickly, and the command is not intuitive enough to look like a command to find and delete 'a.c' and 'b.c.'  
 
-- 문제점2: -i 옵션
+- Problem 2: -i option
 
 ![rm -ri parent](/imgs/2rm_ri.png "rm -ri parent")
 
--i 옵션은 위 사진처럼 디렉터리 진입 여부와 파일 삭제 여부를 계속 확인한다. 위 캡처 화면에서는 child1.c 파일을 남겨두기 위해 /parent/child1.c를 제거하겠냐는 2번째 질문에 n (no)를 입력하였다.
-지금은 테스트용으로 디렉터리와 파일 수가 적기 때문에 삭제 여부에 일일이 대답하는 것이 어렵지 않았다. 그러나 만약 삭제할 디렉터리와 파일 수가 많아진다면, 파일 몇 개를 남기겠다고 들이는 시간과 노력이 수고스러워진다.
+ The '-i' option continues to check whether the directory is entered and whether the file is deleted as shown in the picture above. In the above capture screen, n(no) was entered in the second question of removing '/parent/child1.c' to leave the 'child1.c' file.  
+ It was not difficult to answer whether to delete or not because the number of directories and files is small for testing for now. However, if the number of directories and files to be deleted increases, the time and effort to leave a few files becomes laborious.  
 
-- 결론
+- Conclusion
 
-한 마디로, ‘어떤 디렉터리에서 일부 파일은 남기고 나머지만 삭제’하는 간편한 명령어 옵션이 없다. 이 기능은 커맨드 라인이 아닌, 기본 컴퓨터 OS가 제공하는 Graphical User Interface 환경에서는 누구나, 자주 사용하는 것인 만큼, 유닉스/리눅스 터미널 창에서도 이 기능을 손쉽게 사용할 수 있기를 바란다.
+ In short, there is no easy command option to 'leave some files from a directory and delete only the rest'. As this feature is frequently used by anyone in a graphical user interface environment provided by the underlying computer OS, rather than in a command line, it is hoped that the feature can be easily used in the Unix/Linux terminal window.  
 
-물론, find 명령어와 rm 명령어를 Shell Script 파일로 만드는 방법도 있지만, 이는 몇 가지 불편함을 유발한다. 첫째, 사용자는 Shell Script 파일을 GitHub에서 따로 다운받아야 한다. Shell Script 파일은 기본 GNU 라이브러리의 rm 명령어 옵션으로 등록하지 못하기 때문이다. 둘째, 사용자가 별도로 Shell Script 실행 환경변수를 설정하여야 한다. 환경변수로 등록하지 않으면 Shell Script 파일이 있는 디렉터리에서만 이 기능을 사용할 수 있다. 따라서 실제 rm 명령어와 옵션처럼 어느 위치에서든 Shell Script 파일의 기능을 이용하려면 Shell Script 파일 실행 환경변수 등록이 필수이다.
+ Of course, there are ways to turn the 'find' and 'rm' commands into shell script file, but this causes some inconveniences.  
+ First, the user must download the shell script file separately from our GitHub. That files can't be registered with the 'rm' command option in the default GNU library.  
+ Second, the user must separately execute Shell Script to set the environment variable. If you do not register as an environment variable, you can use this feature only in the directory where the shell script file resides. Therefore, environmental variable registration is required to use the function of the shell script file at any location, such as the actual 'rm' command and option.
 
-이에, 본 프로젝트는 GNU untils의 rm.c 파일에 직접 ‘디렉터리 삭제 시 삭제에서 제외할 파일이 있음을 의미하는 옵션’을 추가할 예정이다. 많은 사용자가 더욱 간단하고 간편하게 이 기능을 누릴 수 있는 환경을 제공하고자한다.
+ So, this project will directly add an option that means there are files to be excluded from deletion when deleting directories" to GNU Untils 'rm.c' file. We want to provide an environment where many users can enjoy this function more simply and easily.
 
 <br>
 
-## 2. 기대효과
+## 2. Expectation effectiveness
 
-기존의 rm이나 find를 조합해 사용하는 명령어는 다수의 파일을 삭제하려면 같은 옵션 명을 여러 번 입력해야 했다. 이에 따라 파일을 입력하는 과정에서 잘못 입력한 파일명을 구분하기 매우 힘들고 명령어를 수정할 때 불편함이 생긴다. 따라서 본 프로젝트에서는 한 번의 옵션명을 입력하고 파일명과 확장자만 반복적으로 입력하여 고급 삭제를 돕는 옵션을 추가함으로써 사용자의 수고를 덜 수 있다.
+Commands that use a combination of existing 'rm' and 'find' had to enter the same option name several times to delete multiple files. it is very difficult to distinguish between incorrectly entered file names in the process of entering files, and inconvenience occurs when modifying commands. So in this project, users can save time by adding options that help them delete advanced by entering one option name and repeatedly entering only the file name and extension.  
 
-또한 삭제 이후 삭제에서 제외된 잔여 파일들은 별도의 디렉터리로 옮겨지며, 잔여 파일들의 원래 경로를 확인할 수 있는 로그 파일(pathLog.txt)을 제공함으로써 사용자가 파일의 원래 용도를 확인하는 데 도움을 줄 수 있다.
+ After deletion, the remaining files that are excluded from deletion are moved to a separate directory, and the user can see the original purpose of the file by viewing the log file (pathLog.txt) that can determine the original path of the remaining files.  
 
-해당 옵션은 기존 rm 명령어 코드에 추가되므로 직관적인 옵션명을 통해 언제나 사용할 수 있다.
+ This option is added to the existing 'rm' command code and is always available through an intuitive option name.  
 
 <br>
 
