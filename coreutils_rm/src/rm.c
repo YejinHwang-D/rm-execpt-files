@@ -203,6 +203,9 @@ rm_option_init (struct rm_options *x)
   /* Since this program exits immediately after calling 'rm', rm need not
      expend unnecessary effort to preserve the initial working directory.  */
   x->require_restore_cwd = false;
+
+  // mine
+  x->remove_except_files = false;
 }
 
 int
@@ -230,6 +233,11 @@ main (int argc, char **argv)
     {
       switch (c)
         {
+        // mine
+        case 'b' :
+          x.remove_except_files = true;
+          break;
+
         case 'd':
           x.remove_empty_directories = true;
           break;
@@ -367,6 +375,15 @@ main (int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
+  // mine
+  if (x.remove_except_files)
+    {
+      fprintf(stderr, "If you want to stop inputting files, you input '!no'");
+      fprintf (stderr, "Which files to exclude from deletion?: ");
+      if (!yesno ())
+        return EXIT_SUCCESS;
+    }
+    
   enum RM_status status = rm (file, &x);
   assert (VALID_STATUS (status));
   return status == RM_ERROR ? EXIT_FAILURE : EXIT_SUCCESS;
