@@ -160,6 +160,10 @@ Remove (unlink) the FILE(s).\n\
   -d, --dir             remove empty directories\n\
   -v, --verbose         explain what is being done\n\
 "), stdout);
+       // mine
+      fputs (_("\
+  -b, --except-files   ask for files to be excluded recursively and remove all files except them\n\
+"), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
