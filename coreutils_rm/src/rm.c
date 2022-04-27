@@ -62,6 +62,9 @@ enum interactive_type
 
 static struct option const long_opts[] =
 {
+  // mine
+  {"except-files", no_argument, NULL, 'b'},
+  
   {"force", no_argument, NULL, 'f'},
   {"interactive", optional_argument, NULL, INTERACTIVE_OPTION},
 
@@ -400,7 +403,7 @@ main (int argc, char **argv)
   // mine
   if (x.remove_except_files)
     {
-      fprintf(stderr, "If you want to stop inputting files, you input '!no'");
+      fprintf(stderr, "If you want to stop inputting files, you input '!no'\n\n");
       fprintf (stderr, "Which files to exclude from deletion?: ");
       if (!yesno ())
         return EXIT_SUCCESS;
