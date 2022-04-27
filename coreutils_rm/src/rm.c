@@ -194,6 +194,9 @@ assurance that the contents are truly unrecoverable, consider using shred(1).\n\
 static void
 rm_option_init (struct rm_options *x)
 {
+  // mine
+  x->remove_except_files = false;
+  
   x->ignore_missing_files = false;
   x->interactive = RMI_SOMETIMES;
   x->one_file_system = false;
@@ -207,9 +210,6 @@ rm_option_init (struct rm_options *x)
   /* Since this program exits immediately after calling 'rm', rm need not
      expend unnecessary effort to preserve the initial working directory.  */
   x->require_restore_cwd = false;
-
-  // mine
-  x->remove_except_files = false;
 }
 
 int
@@ -217,11 +217,21 @@ main (int argc, char **argv)
 {
   bool preserve_root = true;
   struct rm_options x;
+  	/* TEST */
+  fprintf(stderr, "1) x 생성\n");
   bool prompt_once = false;
-  int c;
-
+  int c;  
+  
   initialize_main (&argc, &argv);
+  	/* TEST */
+  fprintf(stderr, "2) initialize main\n");
+  
+  
   set_program_name (argv[0]);
+  	/* TEST */
+  fprintf(stderr, "3) set_program_name\n");
+  
+  
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -229,12 +239,20 @@ main (int argc, char **argv)
   atexit (close_stdin);
 
   rm_option_init (&x);
-
+	/* TEST */
+  fprintf(stderr, "4) rm_option_init\n");
+  
+  
   /* Try to disable the ability to unlink a directory.  */
   priv_set_remove_linkdir ();
-
+  
+	/* TEST */
+  fprintf(stderr, "5) before while...\n");
   while ((c = getopt_long (argc, argv, "dfirvIR", long_opts, NULL)) != -1)
     {
+    	/* TEST */
+      fprintf(stderr, "6) in while...\n");
+      
       switch (c)
         {
         // mine
