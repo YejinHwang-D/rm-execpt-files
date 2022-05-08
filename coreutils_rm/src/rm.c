@@ -401,6 +401,7 @@ main (int argc, char **argv)
     }
 
   // mine
+  /*
   if (x.remove_except_files)
     {
       fprintf(stderr, "If you want to stop inputting files, you input '!no'\n\n");
@@ -408,7 +409,8 @@ main (int argc, char **argv)
       if (!yesno ())
         return EXIT_SUCCESS;
     }
-    
+   */   
+	
   enum RM_status status = rm (file, &x);
   assert (VALID_STATUS (status));
   return status == RM_ERROR ? EXIT_FAILURE : EXIT_SUCCESS;
