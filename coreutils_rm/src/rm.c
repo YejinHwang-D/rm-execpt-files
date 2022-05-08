@@ -383,8 +383,11 @@ main (int argc, char **argv)
     }
 
   uintmax_t n_files = argc - optind;
+  fprintf(stderr, "argc: %d\n", argc); // mine
+  fprintf(stderr, "n_files: %lu\n", n_files); // mine
   char **file =  argv + optind;
-
+  fprintf(stderr, "file: %s\n", file[0]); // mine
+	
   if (prompt_once && (x.recursive || 3 < n_files))
     {
       fprintf (stderr,
