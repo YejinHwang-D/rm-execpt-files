@@ -586,7 +586,6 @@ rm (char *const *file, struct rm_options const *x)
 
   // mine : --except-files 옵션 사용할 경우
   if (*file && x->remove_except_files) {
-     fprintf(stderr, "except_files!!");
       int bit_flags = (FTS_CWDFD
                        | FTS_NOSTAT
                        | FTS_PHYSICAL);
@@ -595,16 +594,29 @@ rm (char *const *file, struct rm_options const *x)
         bit_flags |= FTS_XDEV;
 
       FTS *fts = xfts_open (file, bit_flags, NULL);
-      // yejin : input test
-      char temp[15];
-      if (fscanf(stdin, "%s", temp) == 1) {
-      	fprintf(stdout, "temp: %s\n", temp);
-      }
-      else {
-      	fprintf(stderr, "temp: error\n");
-      }
       
-      
+      // 삭제에서 제외할 파일 입력받아 except_files 배열에 저장하기
+      int user_number;
+      fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
+      if (fscanf(stdin, "%d", &user_number) == 1) {
+         char user_file[50]; // 현재 입력하는 파일
+         char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
+         
+         for (int i = 0; i < user_number; i++) {
+            fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
+            if (fscanf(stdin, "%s", user_file) == 1) {
+               fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
+                except_files[i] = user_file;
+            }
+         }
+         
+         for (int i = 0; i < user_number; i++)
+            fprintf(stdout, "except_files[%d] = %s\n", i, user_file);
+            
+      } else {
+         fprintf(stderr, "*** Error Occurs ***\n");
+      }
+    
       while (true)
         {
           FTSENT *ent;
@@ -621,15 +633,17 @@ rm (char *const *file, struct rm_options const *x)
               break;
             }
 
-	  fprintf(stderr, "fts_path: %s\n", ent->fts_path);
-          fprintf(stderr, "fts_name: %s\n", ent->fts_name); // fts_name
-          fprintf(stderr, "fts_level: %ld\n", ent->fts_level); // fts_level
+	  // fprintf(stderr, "fts_path: %s\n", ent->fts_path);
+          // fprintf(stderr, "fts_name: %s\n", ent->fts_name); // fts_name
+          // fprintf(stderr, "fts_level: %ld\n", ent->fts_level); // fts_level
           
+          /*
           if (strcmp(ent->fts_path, "test_directory/sub/sub1.txt") != 0 ) {
               enum RM_status s = rm_fts (fts, ent, x);
               assert (VALID_STATUS (s));
               UPDATE_STATUS (rm_status, s);
           }
+          */
         }
 
       if (fts_close (fts) != 0)
