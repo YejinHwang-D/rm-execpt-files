@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <assert.h>
+#include <string.h> // mine ^^
 
 #include "system.h"
 #include "error.h"
@@ -583,8 +584,9 @@ rm (char *const *file, struct rm_options const *x)
 {
   enum RM_status rm_status = RM_OK;
 
-  if (*file)
-    {
+  // mine : --except-files 옵션 사용할 경우
+  if (*file && x->remove_except_files) {
+     fprintf(stderr, "except_files!!");
       int bit_flags = (FTS_CWDFD
                        | FTS_NOSTAT
                        | FTS_PHYSICAL);
@@ -593,12 +595,13 @@ rm (char *const *file, struct rm_options const *x)
         bit_flags |= FTS_XDEV;
 
       FTS *fts = xfts_open (file, bit_flags, NULL);
-
+    
       while (true)
         {
           FTSENT *ent;
 
           ent = fts_read (fts);
+          
           if (ent == NULL)
             {
               if (errno != 0)
@@ -608,13 +611,53 @@ rm (char *const *file, struct rm_options const *x)
                 }
               break;
             }
-         
-          fprintf(stderr, "fts_path: %s\n", ent->fts_path);
+
+	  fprintf(stderr, "fts_path: %s\n", ent->fts_path);
           fprintf(stderr, "fts_name: %s\n", ent->fts_name); // fts_name
           fprintf(stderr, "fts_level: %ld\n", ent->fts_level); // fts_level
-         
-          enum RM_status s = rm_fts (fts, ent, x);
+          
+          if (strcmp(ent->fts_path, "test_directory/sub/sub1.txt") != 0 ) {
+              enum RM_status s = rm_fts (fts, ent, x);
+              assert (VALID_STATUS (s));
+              UPDATE_STATUS (rm_status, s);
+          }
+        }
 
+      if (fts_close (fts) != 0)
+        {
+          error (0, errno, _("fts_close failed"));
+          rm_status = RM_ERROR;
+        }
+  }
+  
+  else if (*file)
+    {
+      int bit_flags = (FTS_CWDFD
+                       | FTS_NOSTAT
+                       | FTS_PHYSICAL);
+
+      if (x->one_file_system)
+        bit_flags |= FTS_XDEV;
+
+      FTS *fts = xfts_open (file, bit_flags, NULL);
+    
+      while (true)
+        {
+          FTSENT *ent;
+
+          ent = fts_read (fts);
+          
+          if (ent == NULL)
+            {
+              if (errno != 0)
+                {
+                  error (0, errno, _("fts_read failed"));
+                  rm_status = RM_ERROR;
+                }
+              break;
+            }
+
+          enum RM_status s = rm_fts (fts, ent, x);
           assert (VALID_STATUS (s));
           UPDATE_STATUS (rm_status, s);
         }
