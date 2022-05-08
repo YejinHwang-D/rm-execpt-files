@@ -608,7 +608,11 @@ rm (char *const *file, struct rm_options const *x)
                 }
               break;
             }
-
+         
+          fprintf(stderr, "fts_path: %s\n", ent->fts_path);
+          fprintf(stderr, "fts_name: %s\n", ent->fts_name); // fts_name
+          fprintf(stderr, "fts_level: %ld\n", ent->fts_level); // fts_level
+         
           enum RM_status s = rm_fts (fts, ent, x);
 
           assert (VALID_STATUS (s));
