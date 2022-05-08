@@ -595,7 +595,16 @@ rm (char *const *file, struct rm_options const *x)
         bit_flags |= FTS_XDEV;
 
       FTS *fts = xfts_open (file, bit_flags, NULL);
-    
+      // yejin : input test
+      char temp[15];
+      if (fscanf(stdin, "%s", temp) == 1) {
+      	fprintf(stdout, "temp: %s\n", temp);
+      }
+      else {
+      	fprintf(stderr, "temp: error\n");
+      }
+      
+      
       while (true)
         {
           FTSENT *ent;
