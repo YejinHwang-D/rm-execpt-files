@@ -607,14 +607,17 @@ rm (char *const *file, struct rm_options const *x)
             if (fscanf(stdin, "%s", user_file) == 1) {
                fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
                 except_files[i] = user_file;
+            } else {
+               fprintf(stderr, "user_file failed\n");
             }
          }
          
+         // 배열 출력용 test code
          for (int i = 0; i < user_number; i++)
             fprintf(stdout, "except_files[%d] = %s\n", i, user_file);
             
       } else {
-         fprintf(stderr, "*** Error Occurs ***\n");
+         fprintf(stderr, "user_number failed\n");
       }
     
       while (true)
