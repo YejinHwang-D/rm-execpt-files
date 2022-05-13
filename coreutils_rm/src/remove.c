@@ -597,10 +597,11 @@ rm (char *const *file, struct rm_options const *x)
       
       // 삭제에서 제외할 파일 입력받아 except_files 배열에 저장하기
       int user_number;
+      char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
+      
       fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
       if (fscanf(stdin, "%d", &user_number) == 1) {
          char user_file[50]; // 현재 입력하는 파일
-         char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
          
          for (int i = 0; i < user_number; i++) {
             fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
@@ -636,17 +637,22 @@ rm (char *const *file, struct rm_options const *x)
               break;
             }
 
-	  // fprintf(stderr, "fts_path: %s\n", ent->fts_path);
-          // fprintf(stderr, "fts_name: %s\n", ent->fts_name); // fts_name
-          // fprintf(stderr, "fts_level: %ld\n", ent->fts_level); // fts_level
+	   fprintf(stderr, "fts_path: %s\n", ent->fts_path);
           
-          /*
-          if (strcmp(ent->fts_path, "test_directory/sub/sub1.txt") != 0 ) {
-              enum RM_status s = rm_fts (fts, ent, x);
-              assert (VALID_STATUS (s));
-              UPDATE_STATUS (rm_status, s);
+          bool is_removed = true; // 삭제할 파일이라고 가정
+          for (int i = 0; i < user_number; i++) {
+          	if (strcmp(ent->fts_path, except_files[i]) == 0 ) { // except_files 배열에 속해 있다면
+          		is_removed = false; // 삭제하지 않을 파일이라고 처리
+          		break;
+          	}
           }
-          */
+          
+          // is_removed = true라면 해당 파일 삭제
+          if (is_removed) {
+          	enum RM_status s = rm_fts (fts, ent, x);
+              	assert (VALID_STATUS (s));
+              	UPDATE_STATUS (rm_status, s);
+          }
         }
 
       if (fts_close (fts) != 0)
@@ -656,6 +662,7 @@ rm (char *const *file, struct rm_options const *x)
         }
   }
   
+  // Original
   else if (*file)
     {
       int bit_flags = (FTS_CWDFD
