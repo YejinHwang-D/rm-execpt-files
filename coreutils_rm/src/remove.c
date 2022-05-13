@@ -597,10 +597,10 @@ enum RM_status
 
 		// 삭제에서 제외할 파일 입력받아 except_files 배열에 저장하기
 		int user_number;
-		char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
 
 		fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
 		if (fscanf(stdin, "%d", &user_number) == 1) {
+			char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
 			char user_file[50]; // 현재 입력하는 파일
 
 			for (int i = 0; i < user_number; i++) {
