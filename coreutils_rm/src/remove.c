@@ -615,7 +615,7 @@ rm (char *const *file, struct rm_options const *x)
          
          // 배열 출력용 test code
          for (int i = 0; i < user_number; i++)
-            fprintf(stdout, "except_files[%d] = %s\n", i, user_file);
+            fprintf(stdout, "except_files[%d] = %s\n", i, except_files[i]);
             
       } else {
          fprintf(stderr, "user_number failed\n");
