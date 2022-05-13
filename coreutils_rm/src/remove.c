@@ -607,7 +607,10 @@ enum RM_status
 				fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
 				if (fscanf(stdin, "%s", user_file) == 1) {
 					fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
-					except_files[i] = user_file;
+					
+					char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1)); // user_file 길이만큼의 사이즈인 char* 형 temp 변수 생성
+					strcpy(temp, user_file); // 새로 할당된 메모리(temp)에 user_file 내용 복사
+					except_files[i] = temp; // except_files 배열에 새로 할당된 메모리(temp)의 시작 위치 추가
 				}
 				else {
 					fprintf(stderr, "user_file failed\n");
