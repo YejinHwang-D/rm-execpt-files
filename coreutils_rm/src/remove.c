@@ -600,8 +600,7 @@ enum RM_status
 
 		fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
 		if (fscanf(stdin, "%d", &user_number) == 1) {
-			char** except_files;
-			except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
+			char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
 			char user_file[50]; // 현재 입력하는 파일
 			char check_command1[5] = {'!', 'n', 'o', '\0'};
 			char check_command2[5] = {'e', 'x','i','t', '\0'};
@@ -620,7 +619,7 @@ enum RM_status
                     
                     		if (check_file >= user_number) { //할당된 배열을 모두 사용했을 때 크기 재할당
                         		user_number += 3;
-                        		char** except_files = (char**)realloc(except_files, sizeof(char*) * user_number);
+                        		except_files = (char**)realloc(except_files, sizeof(char*) * user_number);
                     		}
 
 				except_files[check_file] = temp; // except_files 배열에 새로 할당된 메모리(temp)의 시작 위치 추가
