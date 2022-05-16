@@ -41,9 +41,9 @@ If you want to delete all files in the /find directory except for the a.txt and 
 
 Commands that use a combination of existing 'rm' and 'find' had to enter the same option name several times to delete multiple files. it is very difficult to distinguish between incorrectly entered file names in the process of entering files, and inconvenience occurs when modifying commands. So in this project, users can save time by adding options that help them delete advanced by entering one option name and repeatedly entering only the file name and extension.  
 
- After deletion, the remaining files that are excluded from deletion are moved to a separate directory, and the user can see the original purpose of the file by viewing the log file (pathLog.txt) that can determine the original path of the remaining files.  
+If this command option is used, all files in the directory are deleted at once except for the files entered by the user, and the remaining files remain hierarchical, making it easy to understand the structure and purpose of the files.
 
- This option is added to the existing 'rm' command code and is always available through an intuitive option name.  
+Since this option is added to the existing rm command code, it is always available through an intuitive option name.
 
 <br>
 
@@ -74,7 +74,7 @@ Commands that use a combination of existing 'rm' and 'find' had to enter the sam
 
 4️⃣  If there are no more files to exclude, enter '!no' to escape from the delete exclusion file entry repetition.
 
-5️⃣  After the deletion, you can go to the newly created 'remain' directory to check the remaining files and check the original path through the log file (pathLog.txt). **See 6. Processing of remaining files after deletion.**
+5️⃣  After the deletion is in progress, move to the directory where you want to delete the file and check the remaining files. For this, **See 6. Processing of remaining files after deletion.**
 
 <br>
 
@@ -84,7 +84,7 @@ Commands that use a combination of existing 'rm' and 'find' had to enter the sam
 
  The attached capture screen is an input example for describing a detailed function, and is a file input-related prototype to be excluded from deletion. In the above prototype, the Current Working Directory (CWD) is 'home/kmi0817/opensource', and the path to the subdirectory is 'home/kmi0817/opensource/parent'.
 
- The prompt repeats the question of whether there are files to be excluded from deletion until the user enters a particular phrase. In other words, if there are no more files to enter, the user enters ***"!no"*** to exit the question loop, and at the same time, directory deletion proceeds. When entering a file at the prompt, enter it as a relative path by default. At this time, like any terminal function, pressing **tab automatically completes the directory name and file name.**
+ The prompt repeats the question of whether there are files to be excluded from deletion until the user enters a particular phrase. In other words, if there are no more files to enter, the user enters ***"!no"*** or ***"exit"*** to exit the question loop, and at the same time, directory deletion proceeds. When entering a file at the prompt, enter it as a relative path by default. At this time, like any terminal function, pressing **tab automatically completes the directory name and file name.**
 
 ### I. If you enter a file on the Current Working Directory
 
@@ -106,10 +106,4 @@ Commands that use a combination of existing 'rm' and 'find' had to enter the sam
 
 ## 6. Processing remaining files, after deletion.
 
-![remain 디렉터리 내 pathLog.txt 예시](/imgs/4pathLog.png "remain 디렉터리 내 pathLog.txt 예시")
-
- The directory is deleted with the option '-b' or '--exception-files' and the remaining files are stored in a separate directory called 'remain'. This new directory is automatically created in the same path as the deleted directory. Files excluded from deletion are temporarily stored in the "remain" directory without distinguishing the existing upper and lower paths, so it is difficult to distinguish them due to the mixed structure of the files.
-
-![삭제 이후 처리 그림 요약 ](/imgs/5remain.png "삭제 이후 처리 그림 요약 ")
-
- To solve this problem, we also create a log file called "pathLog.txt" inside the 'remain' directory. The log file has text visualization of the existing paths of the copied files, allowing you to determine which subdirectory the files were in.
+After deletion, you can see that the remaining files in the top directory where the internal deletion has been performed remain in the original path. Among other objects (files, directories) inside, only the files to be excluded remain and are deleted. Therefore, the files can maintain the original hierarchical structure, and the user can conveniently check them even after deletion.
