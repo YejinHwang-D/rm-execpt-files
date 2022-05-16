@@ -600,8 +600,38 @@ enum RM_status
 
 		fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
 		if (fscanf(stdin, "%d", &user_number) == 1) {
-			char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
+			char** except_files;
+			except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
 			char user_file[50]; // 현재 입력하는 파일
+			char check_command1[5] = {'!', 'n', 'o', '\0'};
+			char check_command2[5] = {'e', 'x','i','t', '\0'};
+			int check_file = 0; //배열을 늘리기 위한 임시 변수
+			
+
+            		// 파일 입력
+            		while (true) {
+                		fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
+                		if (fscanf(stdin, "%s", user_file) == 1) {
+                			if (user_file == check_command1 || user_file == check_command2)
+                				break;
+					fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
+					char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1)); // user_file 길이만큼의 사이즈인 char* 형 temp 변수 생성
+					strcpy(temp, user_file); // 새로 할당된 메모리(temp)에 user_file 내용 복사
+                    
+                    		if (check_file >= user_number) { //할당된 배열을 모두 사용했을 때 크기 재할당
+                        		user_number += 3;
+                        		char** except_files = (char**)realloc(except_files, sizeof(char*) * user_number);
+                    		}
+
+				except_files[check_file] = temp; // except_files 배열에 새로 할당된 메모리(temp)의 시작 위치 추가
+                    		check_file += 1;
+				}
+				else {
+					fprintf(stderr, "user_file failed\n");
+				}
+            		}
+			
+			
 
 			for (int i = 0; i < user_number; i++) {
 				fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
@@ -616,6 +646,7 @@ enum RM_status
 					fprintf(stderr, "user_file failed\n");
 				}
 			}
+			
 
 			// 배열 출력용 test code
 			for (int i = 0; i < user_number; i++)
@@ -664,7 +695,7 @@ enum RM_status
 		else {
 			fprintf(stderr, "user_number failed\n");
 		}
-	}
+	} // mine : end
 
 	// Original
 	else if (*file)
