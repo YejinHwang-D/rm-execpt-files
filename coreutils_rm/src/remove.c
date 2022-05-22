@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <assert.h>
 #include <string.h> // mine ^^
+#include <unistd.h> // mine
 
 #include "system.h"
 #include "error.h"
@@ -606,7 +607,23 @@ enum RM_status
 			for (int i = 0; i < user_number; i++) {
 				fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
 				if (fscanf(stdin, "%s", user_file) == 1) {
-					fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
+					// fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
+					
+					char apsolute_path[1024]; // 입력받은 파일의 절대경로 담을 변수
+					if (getcwd(apsolute_path, 1024) != NULL) {
+						// printf("작업 디렉터리: %s\n", apsolute_path);
+					
+						strcat(apsolute_path, "/"); // 경로 합치기
+						strcat(apsolute_path, user_file); // 경로 합치기
+						// printf("입력파일 위치: %s\n", apsolute_path);
+						
+						if (access(apsolute_path, F_OK) == -1) {
+							printf("파일이 존재하지 않습니다. 다시 입력해주세요. : \n");
+							/* 다시 파일 입력받는 곳으로 코드 위치 이동해야 함!
+							continue 사용할까 싶지만, continue 사용은 최대한 삼가는 게 좋아서 고민중.
+							*/
+						}
+					}
 					
 					char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1)); // user_file 길이만큼의 사이즈인 char* 형 temp 변수 생성
 					strcpy(temp, user_file); // 새로 할당된 메모리(temp)에 user_file 내용 복사
@@ -618,8 +635,8 @@ enum RM_status
 			}
 
 			// 배열 출력용 test code
-			for (int i = 0; i < user_number; i++)
-				fprintf(stdout, "except_files[%d] = %s\n", i, except_files[i]);
+			//for (int i = 0; i < user_number; i++)
+				// fprintf(stdout, "except_files[%d] = %s\n", i, except_files[i]);
 
 			while (true)
 			{
@@ -637,7 +654,7 @@ enum RM_status
 					break;
 				}
 
-				fprintf(stderr, "fts_path: %s\n", ent->fts_path);
+				// fprintf(stderr, "fts_path: %s\n", ent->fts_path);
 
 				bool is_removed = true; // 삭제할 파일이라고 가정
 				for (int i = 0; i < user_number; i++) {
