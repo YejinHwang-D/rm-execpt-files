@@ -618,10 +618,9 @@ enum RM_status
 						// printf("입력파일 위치: %s\n", apsolute_path);
 						
 						if (access(apsolute_path, F_OK) == -1) {
-							printf("파일이 존재하지 않습니다. 다시 입력해주세요. : \n");
-							/* 다시 파일 입력받는 곳으로 코드 위치 이동해야 함!
-							continue 사용할까 싶지만, continue 사용은 최대한 삼가는 게 좋아서 고민중.
-							*/
+							printf("파일이 존재하지 않습니다. 다시 입력해주세요.\n");
+							i--; // 반복문 i 변수에서 1을 뺀 후
+							continue; // 다시 반복문 헤더로 이동
 						}
 					}
 					
@@ -635,7 +634,7 @@ enum RM_status
 			}
 
 			// 배열 출력용 test code
-			//for (int i = 0; i < user_number; i++)
+			// for (int i = 0; i < user_number; i++)
 				// fprintf(stdout, "except_files[%d] = %s\n", i, except_files[i]);
 
 			while (true)
