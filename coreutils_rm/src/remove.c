@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <string.h> // mine ^^
 #include <unistd.h> // mine
+#include <stdbool.h> // mine for Queue
 
 #include "system.h"
 #include "error.h"
@@ -33,6 +34,87 @@
 #include "write-any-file.h"
 #include "xfts.h"
 #include "yesno.h"
+
+// mine For Queue
+typedef struct node {
+    char* value;
+    struct node* link;
+} node;
+
+typedef struct {
+    node* first;
+    node* rear;
+} queue;
+
+void init_queue(queue* q);
+int Push(queue* q, char* value);
+char* Pop(queue* q);
+void Print(queue* q);
+bool is_empty(queue* q);
+int Size(queue* q);
+bool is_exist(queue* q, char* value);
+
+// For Queue
+void init_queue(queue* q) {
+    q->first = NULL;
+    q->rear = NULL;
+}
+
+int Push(queue* q, char* value) {
+    node* newnode = malloc(sizeof(node));
+
+    if (newnode == NULL)
+        return -1;
+
+    newnode->value = value;
+    newnode->link = NULL;
+
+    if (q->rear != NULL)
+        q->rear->link = newnode;
+    q->rear = newnode;
+
+    if (q->first == NULL)
+        q->first = newnode;
+
+    return 1;
+}
+
+char* Pop(queue* q) {
+    if (q->first == NULL)
+        return NULL;
+
+    node* tmp = q->first;
+    char* result = tmp->value;
+    q->first = q->first->link;
+
+    if (q->first == NULL)
+        q->rear = NULL;
+
+    return result;
+}
+
+void Print(queue* q) {
+    node* tmp;
+
+    for (tmp = q->first; tmp->link != NULL; tmp = tmp->link)
+        printf("%s ", tmp->value);
+    printf("%s\n", tmp->value);
+}
+
+bool is_exist(queue* q, char* value) {
+    node* tmp;
+    
+    printf("Function: %s\n", value);
+    
+    for (tmp = q->first; tmp->link != NULL; tmp = tmp->link) {
+        // q에 value가 존재할 경우
+        if (strcmp(tmp->value, value) == 0)
+            return true;
+    }
+    
+    return false;
+}
+// mine End
 
 enum Ternary
 {
@@ -596,89 +678,76 @@ enum RM_status
 
 		FTS* fts = xfts_open(file, bit_flags, NULL);
 
-		// 삭제에서 제외할 파일 입력받아 except_files 배열에 저장하기
-		int user_number;
-
-		fprintf(stdout, "$ 삭제에서 제외할 파일의 개수를 입력하세요. : ");
-		if (fscanf(stdin, "%d", &user_number) == 1) {
-			char** except_files = (char**)malloc(sizeof(char*) * user_number); // 삭제에서 제외할 파일 담을 배열
-			char user_file[50]; // 현재 입력하는 파일
-
-			for (int i = 0; i < user_number; i++) {
-				fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
-				if (fscanf(stdin, "%s", user_file) == 1) {
-					// fprintf(stdout, "\n** 입력된 파일: %s\n\n", user_file);
+		queue except_files; // 삭제에서 제외할 파일 담을 큐
+		init_queue(&except_files); // 큐 초기
+		
+		char user_file[50]; // 현재 입력하는 파일
+		while (1) {
+ 			fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
+			if (fscanf(stdin, "%s", user_file) == 1) {
+				printf("** %s\n", user_file);
+            
+				if (strcmp(user_file, "!no") == 0) break; // !no 입력 시 파일 입력 멈춤
+				
+				/* 입력한 파일의 존재 여부 확인 */
+				char apsolute_path[1024]; // 입력받은 파일의 절대경로 담을 변수
+				if (getcwd(apsolute_path, 1024) != NULL) {
+					// printf("작업 디렉터리: %s\n", apsolute_path);
 					
-					char apsolute_path[1024]; // 입력받은 파일의 절대경로 담을 변수
-					if (getcwd(apsolute_path, 1024) != NULL) {
-						// printf("작업 디렉터리: %s\n", apsolute_path);
+					strcat(apsolute_path, "/"); // 경로 합치기
+					strcat(apsolute_path, user_file); // 경로 합치기
+					// printf("입력파일 위치: %s\n", apsolute_path);
 					
-						strcat(apsolute_path, "/"); // 경로 합치기
-						strcat(apsolute_path, user_file); // 경로 합치기
-						// printf("입력파일 위치: %s\n", apsolute_path);
+					if (access(apsolute_path, F_OK) == -1) {
+						printf("파일이 존재하지 않습니다. 다시 입력해주세요.\n");
+						continue; // 다시 반복문 헤더로 이동
+					}
+				}
 						
-						if (access(apsolute_path, F_OK) == -1) {
-							printf("파일이 존재하지 않습니다. 다시 입력해주세요.\n");
-							i--; // 반복문 i 변수에서 1을 뺀 후
-							continue; // 다시 반복문 헤더로 이동
-						}
-					}
-					
-					char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1)); // user_file 길이만큼의 사이즈인 char* 형 temp 변수 생성
-					strcpy(temp, user_file); // 새로 할당된 메모리(temp)에 user_file 내용 복사
-					except_files[i] = temp; // except_files 배열에 새로 할당된 메모리(temp)의 시작 위치 추가
-				}
-				else {
-					fprintf(stderr, "user_file failed\n");
-				}
-			}
-
-			// 배열 출력용 test code
-			// for (int i = 0; i < user_number; i++)
-				// fprintf(stdout, "except_files[%d] = %s\n", i, except_files[i]);
-
-			while (true)
-			{
-				FTSENT* ent;
-
-				ent = fts_read(fts);
-
-				if (ent == NULL)
-				{
-					if (errno != 0)
-					{
-						error(0, errno, _("fts_read failed"));
-						rm_status = RM_ERROR;
-					}
-					break;
-				}
-
-				// fprintf(stderr, "fts_path: %s\n", ent->fts_path);
-
-				bool is_removed = true; // 삭제할 파일이라고 가정
-				for (int i = 0; i < user_number; i++) {
-					if (strcmp(ent->fts_path, except_files[i]) == 0) { // except_files 배열에 속해 있다면
-						is_removed = false; // 삭제하지 않을 파일이라고 처리
-						break;
-					}
-				}
-
-				// is_removed = true라면 해당 파일 삭제
-				if (is_removed) {
-					enum RM_status s = rm_fts(fts, ent, x);
-					assert(VALID_STATUS(s));
-					UPDATE_STATUS(rm_status, s);
-				}
-			}
-
-			if (fts_close(fts) != 0)
-			{
-				error(0, errno, _("fts_close failed"));
-				rm_status = RM_ERROR;
+				char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1)); // user_file 길이만큼의 사이즈인 char* 형 temp 변수 생성
+				strcpy(temp, user_file); // 새로 할당된 메모리(temp)에 user_file 내용 복사
+				Push(&except_files, temp); // except_files 큐에 새로 할당된 메모리(temp)의 시작 위치 추가
+			} else {
+				fprintf(stderr, "user_file failed\n");
 			}
 		}
-		else {
-			fprintf(stderr, "user_number failed\n");
+		Print(&except_files);
+		
+
+		while (true)
+		{
+			FTSENT* ent;
+
+			ent = fts_read(fts);
+
+			if (ent == NULL)
+			{
+				if (errno != 0)
+				{
+					error(0, errno, _("fts_read failed"));
+					rm_status = RM_ERROR;
+				}
+				break;
+			}
+
+			// fprintf(stderr, "fts_path: %s\n", ent->fts_path);
+
+			bool is_removed = true; // 삭제할 파일이라고 가정
+			if (is_exist(&except_files, ent->fts_path)) // except_files 큐에 속해 있다면
+				is_removed = false; // 삭제하지 않을 파일이라고 처
+					
+			// is_removed = true라면 해당 파일 삭제
+			if (is_removed) {
+				enum RM_status s = rm_fts(fts, ent, x);
+				assert(VALID_STATUS(s));
+				UPDATE_STATUS(rm_status, s);
+			}
+		}
+
+		if (fts_close(fts) != 0)
+		{
+			error(0, errno, _("fts_close failed"));
+			rm_status = RM_ERROR;
 		}
 	}
 
