@@ -80,6 +80,20 @@ int Size(queue* q) {
     return ++size;
 }
 
+bool IsExist(queue* q, char* value) {
+    node* tmp;
+    
+    printf("Function: %s\n", value);
+    
+    for (tmp = q->first; tmp->link != NULL; tmp = tmp->link) {
+        // q에 value가 존재할 경우
+        if (strcmp(tmp->value, value) == 0)
+            return true;
+    }
+    
+    return false;
+}
+
 int main() {
     queue qu;
     init_queue(&qu);
@@ -101,12 +115,21 @@ int main() {
     }
     
     Print(&qu);
-    
+    if (IsExist(&qu, "first"))
+        printf("**** first 있음\n");
+    else
+        printf("**** first 없음\n");
+        
     char* index = Pop(&qu);
-    printf("%s popped\n", index);
-    
+    // printf("** %s popped\n", index);
+
+    if (IsExist(&qu, index))
+        printf("**** first 있음\n");
+    else
+        printf("**** first 없음\n");
+        
     index = Pop(&qu);
-    printf("%s popped\n", index);
+    // printf("** %s popped\n", index);
     
     Print(&qu);
     
