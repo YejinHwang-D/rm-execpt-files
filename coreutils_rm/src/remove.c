@@ -111,6 +111,11 @@ bool is_exist(queue* q, char* value) {
         if (strcmp(tmp->value, value) == 0)
             return true;
     }
+    if (strcmp(tmp->value, value) == 0) {
+        // 마지막 node까지 검사
+        printf("\tFunction: %s\n", value);
+        return true;
+    }
     
     return false;
 }
