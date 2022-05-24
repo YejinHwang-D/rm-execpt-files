@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define QUEUE_EMPTY "Empty"
 #define MAX_SIZE 100
@@ -83,15 +84,31 @@ int main() {
     queue qu;
     init_queue(&qu);
     
-    Push(&qu, "hi");
-    Push(&qu, "world");
-    Push(&qu, "hello");
+    char user_file[50];
+    
+    while (1) {
+        fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
+        if (fscanf(stdin, "%s", user_file) == 1) {
+            printf("** %s\n", user_file);
+            
+            if (strcmp(user_file, "!no") == 0) break;
+            
+            char* temp = (char*)malloc(sizeof(char) * (strlen(user_file) + 1));
+            
+            strcpy(temp, user_file);
+            Push(&qu, temp);
+        }
+    }
     
     Print(&qu);
     
     char* index = Pop(&qu);
     printf("%s popped\n", index);
     
+    index = Pop(&qu);
+    printf("%s popped\n", index);
+    
     Print(&qu);
+    
     return 0;
 }
