@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <limits.h> // for INT_MIN
 
-#define QUEUE_EMPTY INT_MIN
+#define QUEUE_EMPTY "Empty"
 #define MAX_SIZE 100
 
 // For Queue
 typedef struct node {
-    int value;
+    char* value;
     struct node* link;
 } node;
 
@@ -23,7 +22,7 @@ void init_queue(queue* q) {
     q->rear = NULL;
 }
 
-int Push(queue* q, int value) {
+int Push(queue* q, char* value) {
     node* newnode = malloc(sizeof(node));
 
     if (newnode == NULL)
@@ -42,12 +41,12 @@ int Push(queue* q, int value) {
     return 1;
 }
 
-int Pop(queue* q) {
+char* Pop(queue* q) {
     if (q->first == NULL)
         return QUEUE_EMPTY;
 
     node* tmp = q->first;
-    int result = tmp->value;
+    char* result = tmp->value;
     q->first = q->first->link;
 
     if (q->first == NULL)
@@ -60,8 +59,8 @@ void Print(queue* q) {
     node* tmp;
 
     for (tmp = q->first; tmp->link != NULL; tmp = tmp->link)
-        printf("%d ", tmp->value);
-    printf("%d\n", tmp->value);
+        printf("%s ", tmp->value);
+    printf("%s\n", tmp->value);
 }
 
 bool is_empty(queue* q) {
@@ -84,14 +83,14 @@ int main() {
     queue qu;
     init_queue(&qu);
     
-    Push(&qu, 1);
-    Push(&qu, 5);
-    Push(&qu, 9);
+    Push(&qu, "hi");
+    Push(&qu, "world");
+    Push(&qu, "hello");
     
     Print(&qu);
     
-    int index = Pop(&qu);
-    printf("%d popped\n", index);
+    char* index = Pop(&qu);
+    printf("%s popped\n", index);
     
     Print(&qu);
     return 0;
