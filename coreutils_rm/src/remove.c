@@ -100,25 +100,6 @@ void Print(queue* q) {
         printf("%s ", tmp->value);
     printf("%s\n", tmp->value);
 }
-
-bool is_exist(queue* q, char* value) {
-    node* tmp;
-    
-    printf("Function: %s\n", value);
-    
-    for (tmp = q->first; tmp->link != NULL; tmp = tmp->link) {
-        // q에 value가 존재할 경우
-        if (strcmp(tmp->value, value) == 0)
-            return true;
-    }
-    if (strcmp(tmp->value, value) == 0) {
-        // 마지막 node까지 검사
-        printf("\tFunction: %s\n", value);
-        return true;
-    }
-    
-    return false;
-}
 // mine End
 
 enum Ternary
@@ -690,7 +671,7 @@ enum RM_status
 		while (1) {
  			fprintf(stdout, "\n$ 삭제에서 제외할 파일을 입력하세요. : ");
 			if (fscanf(stdin, "%s", user_file) == 1) {
-				printf("** %s\n", user_file);
+				// printf("** %s\n", user_file);
             
 				if (strcmp(user_file, "!no") == 0) break; // !no 입력 시 파일 입력 멈춤
 				
@@ -716,7 +697,7 @@ enum RM_status
 				fprintf(stderr, "user_file failed\n");
 			}
 		}
-		Print(&except_files);
+		// Print(&except_files);
 		
 
 		while (true)
@@ -737,11 +718,19 @@ enum RM_status
 
 			// fprintf(stderr, "fts_path: %s\n", ent->fts_path);
 
+
+			/* ent->fts_path가 삭제에서 제외할 파일인지 체크하는 과정 */
 			bool is_removed = true; // 삭제할 파일이라고 가정
-			if (is_exist(&except_files, ent->fts_path)) // except_files 큐에 속해 있다면
-				is_removed = false; // 삭제하지 않을 파일이라고 처
+			node* tmp;
+			for (tmp = except_files.first; tmp->link != NULL; tmp = tmp->link) {
+				 // except_files 큐에 속해 있다면
+				if (strcmp(tmp->value, ent->fts_path) == 0)
+					is_removed = false; // 삭제하지 않을 파일이라고 처리
+			}
+			if (is_removed && strcmp(tmp->value, ent->fts_path) == 0)
+				is_removed = false; // is_removed == true일 때 마지막 node까지 검사
 					
-			// is_removed = true라면 해당 파일 삭제
+			/* is_removed = true라면 해당 파일 삭제하는 과정 */
 			if (is_removed) {
 				enum RM_status s = rm_fts(fts, ent, x);
 				assert(VALID_STATUS(s));
