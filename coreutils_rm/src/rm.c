@@ -251,7 +251,7 @@ main (int argc, char **argv)
   
 	/* TEST */
   fprintf(stderr, "5) before while...\n");
-  while ((c = getopt_long (argc, argv, "dfirvIR", long_opts, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "bdfirvIR", long_opts, NULL)) != -1)
     {
     	/* TEST */
       fprintf(stderr, "6) in while...\n");
@@ -262,7 +262,6 @@ main (int argc, char **argv)
         case 'b' :
           x.remove_except_files = true;
           break;
-
         case 'd':
           x.remove_empty_directories = true;
           break;
