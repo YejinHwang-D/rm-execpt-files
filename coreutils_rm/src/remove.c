@@ -477,7 +477,11 @@ excise(FTS* fts, FTSENT* ent, struct rm_options const* x, bool is_dir)
 			|| errno == EEXIST)
 		&& (ent->fts_errno == EPERM || ent->fts_errno == EACCES))
 		errno = ent->fts_errno;
-	error(0, errno, _("cannot remove %s"), quoteaf(ent->fts_path));
+	if (x->remove_except_files) {
+		printf("\n디렉터리가 성공적으로 삭제되었습니다.\n");
+	} else {
+		error(0, errno, _("cannot remove %s"), quoteaf(ent->fts_path));
+	}
 	mark_ancestor_dirs(ent);
 	return RM_ERROR;
 }
@@ -494,19 +498,24 @@ rm_fts(FTS* fts, FTSENT* ent, struct rm_options const* x)
 	switch (ent->fts_info)
 	{
 	case FTS_D:			/* preorder directory */
-		if (!x->recursive
-			&& !(x->remove_empty_directories
-				&& is_empty_dir(fts->fts_cwd_fd, ent->fts_accpath)))
-		{
+		if (x->remove_except_files == false) { // except-files 옵션 사용하지 않을 
+			if (!x->recursive
+				&& !(x->remove_empty_directories
+					&& is_empty_dir(fts->fts_cwd_fd, ent->fts_accpath)))
+			{
+			
 			/* This is the first (pre-order) encounter with a directory
 			   that we cannot delete.
 			   Not recursive, and it's not an empty directory (if we're removing
 			   them) so arrange to skip contents.  */
-			int err = x->remove_empty_directories ? ENOTEMPTY : EISDIR;
-			error(0, err, _("cannot remove %s"), quoteaf(ent->fts_path));
-			mark_ancestor_dirs(ent);
-			fts_skip_tree(fts, ent);
-			return RM_ERROR;
+				int err = x->remove_empty_directories ? ENOTEMPTY : EISDIR;
+				error(0, err, _("cannot remove %s"), quoteaf(ent->fts_path));
+				mark_ancestor_dirs(ent);
+				fts_skip_tree(fts, ent);
+				return RM_ERROR;
+			}		
+		} else { // except-files 옵션 사용할 때
+			//printf("*** remove_except_files === true\n");
 		}
 
 		/* Perform checks that can apply only for command-line arguments.  */
