@@ -64,7 +64,33 @@ Since this option is added to the existing rm command code, it is always availab
 
 <br>
 
-## 4. User's Guide
+## 4. Developer Guide
+1. Install the essential tools in the README-prereq
+https://github.com/coreutils/coreutils/blob/master/README-prereq
+
+2. Proceed as directed in the README-hacking
+https://github.com/coreutils/coreutils/blob/master/README-hacking
+
+3. Replace the 3 modified files  
+ [Reference](https://github.com/YejinHwang-D/rm-execpt-files/tree/main/coreutils_rm/src)  
+remove.h  
+remove.c  
+rm.c  
+
+4. Test after compilation
+
+Recompile with changes
+```
+cd ~/coreutils
+make
+```
+command option test
+```
+~/coreutils/rm -rb [Directory Name]
+~/coreutils/rm -r --except-files [Directory Name]
+```
+
+## 5. User's Guide
 
 1️⃣  Update the GNU operating system version to use the rm command option with the new option added.
 
@@ -78,7 +104,7 @@ Since this option is added to the existing rm command code, it is always availab
 
 <br>
 
-## 5. How to input files
+## 6. How to input files
 
 ![터미널 창에서의 입력 관련 프로토타입](/imgs/3prototype.png "터미널 창에서의 입력 관련 프로토타입")
 
@@ -104,6 +130,6 @@ Since this option is added to the existing rm command code, it is always availab
 
 <br>
 
-## 6. Processing remaining files, after deletion.
+## 7. Processing remaining files, after deletion.
 
 After deletion, you can see that the remaining files in the top directory where the internal deletion has been performed remain in the original path. Among other objects (files, directories) inside, only the files to be excluded remain and are deleted. Therefore, the files can maintain the original hierarchical structure, and the user can conveniently check them even after deletion.
